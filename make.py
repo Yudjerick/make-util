@@ -17,13 +17,16 @@ else:
     sys.exit()
     
 makefilejson = {}
+phonylist = []
 
 for i in makefile.split('\n'):
     if len(i) == 0:
         continue
     if i.startswith('    ') or i[0] == '\t':
         makefilejson[cur_target]["commands"].append(i.replace('    ','').replace('\t',''))
-    else:
+    elif i.split()[0].replace(':','') == '.PHONY':
+        phonylist = i.split(':')[1].split(' ')
+    else:    
         cur_target = i.split()[0].replace(':','')
         dependencies = i.split()
         dependencies.pop(0)
@@ -37,6 +40,10 @@ else:
     fileshashes = {}
 
 def make(target):
+    if(target in phonylist):
+        for i in makefilejson[target]["commands"]:
+            os.system(i)
+        return True
     need_to_change = False
     for i in makefilejson[target]["dependencies"]:
         r = make(i)
@@ -51,6 +58,8 @@ def make(target):
         fileshashes[target] = hashlib.sha1(open(target).read().encode()).hexdigest()
     return True
 
-make(target)
+updated = make(target)
+if not(updated):
+    print("'" +target + "' is up to date")
 f = open('hashes.txt', 'w')
 f.write(json.dumps(fileshashes))

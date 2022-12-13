@@ -1,3 +1,5 @@
+.PHONY: delete
+
 dress: trousers shoes jacket
 	@echo "dress" > dress
 	@echo "All done. Let's go outside!"
@@ -29,3 +31,14 @@ shoes: socks
 socks: pullover
 	@echo "Putting on socks."
 	@echo "pullover" > socks
+
+delete: 
+	del dress
+	del jacket
+	del pullover
+	del shirt
+	del trousers
+	del underpants
+	del shoes
+	del socks
+	@echo "Deleted all files"
